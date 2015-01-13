@@ -71,7 +71,7 @@ class main:
             for movie in matchesMovie:
 
                 # Trailer URL
-                matchesLinkTrailer = list(set(re.compile('href="(/video/trailer/[^"]+)"').findall(movie)))
+                matchesLinkTrailer = list(set(re.compile('href="(/video/zwiastun/[^"]+)"').findall(movie)))
                 
                 # jeśli istnieje trailer pobiera informacje
                 if len(matchesLinkTrailer) != 0:

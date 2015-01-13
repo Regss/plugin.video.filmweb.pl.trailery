@@ -53,7 +53,7 @@ class main:
             
             # Trailer URL
             matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-            matchesLinkTrailer = list(set(re.compile('a href="(/video/trailer/[^"]+)"').findall(matchesStringsTrailer[0])))
+            matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesStringsTrailer[0])))
             
             # jeśli istnieje trailer pobiera informacje
             if len(matchesLinkTrailer) != 0:

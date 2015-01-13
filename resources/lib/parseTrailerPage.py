@@ -168,9 +168,6 @@ class main:
         listitem.setInfo(type='Video', infoLabels={ 'Director': movieDirector})
         listitem.setInfo(type='Video', infoLabels={ 'Credits': movieCredits})
         listitem.setInfo(type='Video', infoLabels={ 'Genre': movieGenre})
-        xbmcplugin.addSortMethod( handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
-        xbmcplugin.addSortMethod( handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_YEAR )
-        xbmcplugin.addSortMethod( handle=int(sys.argv[1]), sortMethod=xbmcplugin.SORT_METHOD_VIDEO_RATING )
         xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=trailerVideos, listitem=listitem, isFolder=False)
         self.MOVIES.append({'url': trailerVideos, 'title': movieTitle, 'item': listitem, 'poster': moviePoster})
         

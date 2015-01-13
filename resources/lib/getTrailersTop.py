@@ -51,43 +51,14 @@ class main:
                 i = i + 1
             xbmcplugin.endOfDirectory(int(sys.argv[1]))
         
-        elif self.opt2 == '0' or self.opt2 == '1' or self.opt2 == '2':
-        
-            # połączenie z adresem URL, pobranie zawartości strony
-            opener = urllib2.build_opener()
-            page = opener.open(self.URL + mc[int(self.opt2)][1]).read()
-            
-            # pobranie linków do poszczególnych filmów
-            matchesMovie = list(re.compile('<a href="([^"]+)"[^"]+"filmOtherInfo').findall(page))
-            
-            # pobranie zawartości strony z trailerami
-            i = 1
-            for movieLink in matchesMovie:
-            
-                # ograniczenie pozycji
-                if i > self.settingsLimit:
-                    break
-                    
-                pageMovie = opener.open(self.URL + movieLink + '/video').read()
-                
-                # Trailer URL
-                matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-                matchesLinkTrailer = list(set(re.compile('a href="(/video/trailer/[^"]+)"').findall(matchesStringsTrailer[0])))
-                
-                # jeśli istnieje trailer pobiera informacje
-                if len(matchesLinkTrailer) != 0:
-                    import parseTrailerPage
-                    parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
-                    i = i + 1
-        
         else:
-            
+        
             # połączenie z adresem URL, pobranie zawartości strony
             opener = urllib2.build_opener()
             page = opener.open(self.URL + mc[int(self.opt2)][1]).read()
             
             # pobranie linków do poszczególnych filmów
-            matchesMovie = list(re.compile('filmOtherInfo"?[^"]+"([^"]+)"').findall(page))
+            matchesMovie = list(re.compile('entityPoster" href="([^"]+)"').findall(page))
             
             # pobranie zawartości strony z trailerami
             i = 1
@@ -101,11 +72,11 @@ class main:
                 
                 # Trailer URL
                 matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-                matchesLinkTrailer = list(set(re.compile('a href="(/video/trailer/[^"]+)"').findall(matchesStringsTrailer[0])))
+                matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesStringsTrailer[0])))
                 
                 # jeśli istnieje trailer pobiera informacje
                 if len(matchesLinkTrailer) != 0:
                     import parseTrailerPage
                     parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
                     i = i + 1
-            
+        

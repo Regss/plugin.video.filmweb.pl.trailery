@@ -29,43 +29,44 @@ class main:
         
         # vars
         self = selfGet
-        
-        day = [
-            ['Poniedziałek', 'poniedzialek'],
-            ['Wtorek', 'wtorek'],
-            ['Środa', 'sroda'],
-            ['Czwartek', 'czwartek'],
-            ['Piątek', 'piatek'],
-            ['Sobota', 'sobota'],
-            ['Niedziela', 'niedziela']
-            ]
+        encodeCity = urllib.quote(self.settingsCity)
         
         if self.opt2 == '':
 
-            for key in day:
-                listItemKino = xbmcgui.ListItem(label=key[0])
-                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sys.argv[0] + '?city_' + key[1], listitem=listItemKino, isFolder=True)
+            opener = urllib2.build_opener()
+            page = opener.open(self.URL + '/showtimes/' + encodeCity).read()
+            matchListDays = re.compile('day-switcher top-20">(.*?)</ul>').findall(page)
+            matchDays = re.compile('<a[^>]+>([^<]+)<br>([^<]+)</a>').findall(matchListDays[0])
             
+            i = 0;
+            for key in matchDays:
+                listItemCity = xbmcgui.ListItem(label=key[0] + key[1])
+                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sys.argv[0] + '?city_' + str(i), listitem=listItemCity, isFolder=True)
+                i += 1;
+                
             xbmcplugin.endOfDirectory(int(sys.argv[1]))
             
         else:
-        
+            
             # połączenie z adresem URL, pobranie zawartości strony
-            encodeCity = urllib.quote(self.settingsCity)
             opener = urllib2.build_opener()
-            page = opener.open(self.URL + '/city/' + encodeCity + '/day/' + self.opt2).read()
-            
+            page = opener.open(self.URL + '/showtimes/' + encodeCity + '?day=' + self.opt2).read()
+            print page
             # pobranie linków do poszczególnych filmów
-            matchesMovie = list(set(re.compile('(div class="dropdownTarget.*?trailerLink[^>]+>)').findall(page)))
-            
+            matchesMovie = list(set(re.compile('<a class="name[^>]+href="(/film/[^/]+)/').findall(page)))
+            print matchesMovie
             # pobranie zawartości strony z trailerami
             for movieLink in matchesMovie:
+                print self.URL + movieLink + '/video'
+                pageMovie = opener.open(self.URL + movieLink + '/video').read()
                 
                 # Trailer URL
-                matchesLinkTrailer = re.compile('trailerLink" href="([^"]+)"').findall(movieLink)
+                matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
+                matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesStringsTrailer[0])))
                 
                 # jeśli istnieje trailer pobiera informacje
                 if len(matchesLinkTrailer) != 0:
                     import parseTrailerPage
                     parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
+
                     
