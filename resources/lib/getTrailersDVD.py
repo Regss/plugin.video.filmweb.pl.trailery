@@ -66,19 +66,13 @@ class main:
                         
             # pobranie linków do poszczególnych filmów
             matchesPageString = list(set(re.compile('editionList.*?dvdNewsroom').findall(page)))
-            matchesMovie = list(set(re.compile('href="([^"]+)/editions"').findall(matchesPageString[0])))
+            matchesLinkMovie = list(set(re.compile('href="([^"]+)/editions"').findall(matchesPageString[0])))
             
-            # pobranie zawartości strony z trailerami
-            for movieLink in matchesMovie:
-                
-                pageMovie = opener.open(self.URL + movieLink + '/video').read()
-                
-                # Trailer URL
-                matchesTrailerString = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-                matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesTrailerString[0])))
-                
-                # jeśli istnieje trailer pobiera informacje
-                if len(matchesLinkTrailer) != 0:
-                    import parseTrailerPage
-                    parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
+            # ograniczenie listy
+            matchesLinkMovie = matchesLinkMovie[:self.settingsLimit]
+        
+            # jeśli istnieje trailer pobiera informacje
+            if len(matchesLinkMovie) != 0:
+                import parseTrailerPage
+                parseTrailerPage.main().parseTrailer(self, matchesLinkMovie)
                     

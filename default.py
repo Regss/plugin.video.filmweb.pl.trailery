@@ -29,7 +29,6 @@ class Trailers:
         self.settingsAutoPlay   = __addon__.getSetting('autoPlay')
         self.settingsLogin      = __addon__.getSetting('login')
         self.settingsCity       = __addon__.getSetting('city')
-        self.settingsInfo       = __addon__.getSetting('info')
         self.settingsLimit      = int(__addon__.getSetting('limit'))
         self.URL                = 'http://www.filmweb.pl'
         self.MOVIES             = []

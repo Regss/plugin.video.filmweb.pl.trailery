@@ -64,16 +64,14 @@ class main:
             else:
                 page = opener.open(self.URL + '/premiere/' + self.year + '/' + self.opt2).read()
 
-            # pobranie linków do poszczególnych filmów
-            matchesMovie = list(set(re.compile('(div class="filmPreview.*?id=filmId>)').findall(page)))
+            # pobieranie linków
+            matchesLinkMovie = list(set(re.compile('entityTitle"><a href="([^"]+)"').findall(page)))
             
-            # pobranie zawartości strony z trailerami
-            for movie in matchesMovie:
-
-                # Trailer URL
-                matchesLinkTrailer = list(set(re.compile('href="(/video/zwiastun/[^"]+)"').findall(movie)))
+            # ograniczenie listy
+            matchesLinkMovie = matchesLinkMovie[:self.settingsLimit]
+        
+            # jeśli istnieje trailer pobiera informacje
+            if len(matchesLinkMovie) != 0:
+                import parseTrailerPage
+                parseTrailerPage.main().parseTrailer(self, matchesLinkMovie)
                 
-                # jeśli istnieje trailer pobiera informacje
-                if len(matchesLinkTrailer) != 0:
-                    import parseTrailerPage
-                    parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)

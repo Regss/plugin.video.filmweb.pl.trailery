@@ -58,25 +58,13 @@ class main:
             page = opener.open(self.URL + mc[int(self.opt2)][1]).read()
             
             # pobranie linków do poszczególnych filmów
-            matchesMovie = list(re.compile('entityPoster" href="([^"]+)"').findall(page))
+            matchesLinkMovie = list(re.compile('entityPoster" href="([^"]+)"').findall(page))
             
-            # pobranie zawartości strony z trailerami
-            i = 1
-            for movieLink in matchesMovie:
+            # ograniczenie listy
+            matchesLinkMovie = matchesLinkMovie[:self.settingsLimit]
             
-                # ograniczenie pozycji
-                if i > self.settingsLimit:
-                    break
-                    
-                pageMovie = opener.open(self.URL + movieLink + '/video').read()
-                
-                # Trailer URL
-                matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-                matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesStringsTrailer[0])))
-                
-                # jeśli istnieje trailer pobiera informacje
-                if len(matchesLinkTrailer) != 0:
-                    import parseTrailerPage
-                    parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
-                    i = i + 1
+            # jeśli istnieje trailer pobiera informacje
+            if len(matchesLinkMovie) != 0:
+                import parseTrailerPage
+                parseTrailerPage.main().parseTrailer(self, matchesLinkMovie)
         

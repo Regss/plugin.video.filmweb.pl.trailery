@@ -35,8 +35,9 @@ class main:
 
             opener = urllib2.build_opener()
             page = opener.open(self.URL + '/showtimes/' + encodeCity).read()
-            matchListDays = re.compile('day-switcher top-20">(.*?)</ul>').findall(page)
-            matchDays = re.compile('<a[^>]+>([^<]+)<br>([^<]+)</a>').findall(matchListDays[0])
+            
+            matchListDays = re.search('day-switcher top-20"?>(.*?)</ul>', page)
+            matchDays = re.compile('<a[^>]+>([^<]+)<br>([^<]+)</a>').findall(matchListDays.group(1))
             
             i = 0;
             for key in matchDays:
@@ -51,22 +52,14 @@ class main:
             # połączenie z adresem URL, pobranie zawartości strony
             opener = urllib2.build_opener()
             page = opener.open(self.URL + '/showtimes/' + encodeCity + '?day=' + self.opt2).read()
-            print page
+            
             # pobranie linków do poszczególnych filmów
-            matchesMovie = list(set(re.compile('<a class="name[^>]+href="(/film/[^/]+)/').findall(page)))
-            print matchesMovie
-            # pobranie zawartości strony z trailerami
-            for movieLink in matchesMovie:
-                print self.URL + movieLink + '/video'
-                pageMovie = opener.open(self.URL + movieLink + '/video').read()
-                
-                # Trailer URL
-                matchesStringsTrailer = re.compile('filmSubpageContent(.*?)filmSubpageMenu').findall(pageMovie)
-                matchesLinkTrailer = list(set(re.compile('a href="(/video/zwiastun/[^"]+)"').findall(matchesStringsTrailer[0])))
-                
-                # jeśli istnieje trailer pobiera informacje
-                if len(matchesLinkTrailer) != 0:
-                    import parseTrailerPage
-                    parseTrailerPage.main().parseTrailer(self, matchesLinkTrailer)
-
-                    
+            matchesLinkMovie = list(set(re.compile('<a class="name[^>]+href="(/film/[^/]+)/').findall(page)))
+            
+            # ograniczenie listy
+            matchesLinkMovie = matchesLinkMovie[:self.settingsLimit]
+        
+            # jeśli istnieje trailer pobiera informacje
+            if len(matchesLinkMovie) != 0:
+                import parseTrailerPage
+                parseTrailerPage.main().parseTrailer(self, matchesLinkMovie)
