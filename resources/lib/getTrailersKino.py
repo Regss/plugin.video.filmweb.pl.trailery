@@ -9,8 +9,6 @@ import xbmc
 import xbmcaddon
 import xbmcplugin
 import xbmcgui
-import HTMLParser
-import datetime
 
 __addon__               = xbmcaddon.Addon()
 __addon_id__            = __addon__.getAddonInfo('id')
@@ -46,12 +44,11 @@ class main:
             ['Grudzień', '12']
             ]
             
-        if self.opt2 == '':
+        if 'arg' not in self.opt.keys():
 
             for key in mc:
                 listItem = xbmcgui.ListItem(label=key[0])
-                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sys.argv[0] + '?kino_' + key[1], listitem=listItem, isFolder=True)
-            
+                xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=sys.argv[0] + '?site=' + self.opt['site'] + '&arg=' + key[1], listitem=listItem, isFolder=True)
             xbmcplugin.endOfDirectory(int(sys.argv[1]))
             
         else:
@@ -59,19 +56,16 @@ class main:
             # połączenie z adresem URL, pobranie zawartości strony
             opener = urllib2.build_opener()
             
-            if self.opt2 == 'week':
+            if self.opt['arg'] == 'week':
                 page = opener.open(self.URL + '/premiere').read()
             else:
-                page = opener.open(self.URL + '/premiere/' + self.year + '/' + self.opt2).read()
-
-            # pobieranie linków
-            matchesLinkMovie = list(set(re.compile('entityTitle"><a href="([^"]+)"').findall(page)))
+                page = opener.open(self.URL + '/premiere/' + self.year + '/' + self.opt['arg']).read()
             
-            # ograniczenie listy
-            matchesLinkMovie = matchesLinkMovie[:self.settingsLimit]
-        
-            # jeśli istnieje trailer pobiera informacje
-            if len(matchesLinkMovie) != 0:
-                import parseTrailerPage
-                parseTrailerPage.main().parseTrailer(self, matchesLinkMovie)
+            # pobieranie ID
+            matchesID = list(set(re.compile('previewFilmId-([0-9]+)').findall(page)))
+            
+            # pobieranie trailerów
+            if len(matchesID) != 0:
+                import getTrailers
+                getTrailers.main().parseTrailer(self, matchesID)
                 

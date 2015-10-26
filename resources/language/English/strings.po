@@ -3,32 +3,42 @@ msgid ""
 msgstr ""
 "Language: en\n"
 
-#. login
 #: resources/settings.xml
-msgctxt "#30000"
-msgid "Filmweb login"
+msgctxt "#32000"
+msgid "Login"
 msgstr ""
 
-#. autoPlay
 #: resources/settings.xml
-msgctxt "#30001"
+msgctxt "#32001"
+msgid "Password"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32002"
 msgid "Auto play"
 msgstr ""
 
-#. city
 #: resources/settings.xml
-msgctxt "#30002"
+msgctxt "#32003"
 msgid "City"
 msgstr ""
 
-#. info
 #: resources/settings.xml
-msgctxt "#30003"
-msgid "Get all info"
+msgctxt "#32004"
+msgid "Play when screensaver activ"
 msgstr ""
 
-#. limit
 #: resources/settings.xml
-msgctxt "#30004"
-msgid "Limit trailers"
+msgctxt "#32005"
+msgid "Section for screensaver"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32006"
+msgid "Notify if new DVD premiere that you want to see are available"
+msgstr ""
+
+#: resources/settings.xml
+msgctxt "#32010"
+msgid "Debug"
 msgstr ""

@@ -9,63 +9,96 @@ import xbmc
 import xbmcaddon
 import xbmcplugin
 import xbmcgui
-import HTMLParser
 import datetime
+import json
 
 __addon__               = xbmcaddon.Addon()
-__addon_id__            = __addon__.getAddonInfo('id')
-__addonname__           = __addon__.getAddonInfo('name')
-__icon__                = __addon__.getAddonInfo('icon')
 __addonpath__           = xbmc.translatePath(__addon__.getAddonInfo('path'))
-__lang__                = __addon__.getLocalizedString
 __path__                = os.path.join(__addonpath__, 'resources', 'lib' )
 __path_img__            = os.path.join(__addonpath__, 'resources', 'media' )
 
 sys.path.append (__path__)
 sys.path.append (__path_img__)
 
+import debug
+
 class Trailers:
     def __init__(self):
-        self.settingsAutoPlay   = __addon__.getSetting('autoPlay')
-        self.settingsLogin      = __addon__.getSetting('login')
-        self.settingsCity       = __addon__.getSetting('city')
-        self.settingsLimit      = int(__addon__.getSetting('limit'))
-        self.URL                = 'http://www.filmweb.pl'
-        self.MOVIES             = []
-        self.parseHtml          = HTMLParser.HTMLParser()
-        date                    = datetime.datetime.now()
-        self.year               = str(date.year)
+        self.settingsAutoPlay               = __addon__.getSetting('autoPlay')
+        self.settingsCity                   = __addon__.getSetting('city')
+        self.settingsScreenSaverAutoPlay    = __addon__.getSetting('screenSaverAutoPlay')
+        self.settingsScreenSaverSection     = __addon__.getSetting('screenSaverSection')
+        self.settingsCheckNew               = __addon__.getSetting('checkNew')
+        self.URL                            = 'http://www.filmweb.pl'
+        self.MOVIES                         = []
+        date                                = datetime.datetime.now()
+        self.year                           = str(date.year)
         
-        optMatches = re.compile('\?([^_]+)_?').findall(sys.argv[2])
-        if len(optMatches) == 0:
-            self.opt = ''
-        else:
-            self.opt = optMatches[0]
+        debug.debug(str(sys.argv))
         
-        optMatches2 = re.compile('_([^_]+)_?').findall(sys.argv[2])
-        if len(optMatches2) == 0:
-            self.opt2 = ''
-        else:
-            self.opt2 = optMatches2[0]
+        self.opt = {}
+        # pobranie zmiennych
+        optStr = sys.argv[2][1:]
+        pair = optStr.split('&')
+        for p in pair:
+            nv = p.split('=')
+            if len(nv) > 1:
+                self.opt[nv[0]] = nv[1]
         
-        if self.opt == 'kino':
+        self.start()
+        
+    def start(self):
+        debug.debug('opt: ' + str(self.opt))
+        
+        # check new DVD premiere to wanna see and notify
+        if 'true' in self.settingsCheckNew:
+            if 'service' in self.opt.keys() and self.opt['service'] == '2':
+                import getTrailersAfterPremiere as load
+                ret = load.main().parse(self)
+                if ret == False:
+                    return False
+                debug.notify(str(len(ret)) + ' Nowych premier DVD')
+                return
+        
+        # if start from service set args
+        if 'service' in self.opt.keys() and self.opt['service'] == '1':
+            # check if player not playing
+            jsonPlayer = '{"jsonrpc": "2.0", "method": "Player.GetActivePlayers", "id": "1"}'
+            jsonGetPlayer = xbmc.executeJSONRPC(jsonPlayer)
+            jsonGetPlayer = unicode(jsonGetPlayer, 'utf-8', errors='ignore')
+            jsonGetPlayerResponse = json.loads(jsonGetPlayer)
+            if 'result' in jsonGetPlayerResponse and len(jsonGetPlayerResponse['result']) == 0 and 'true' in self.settingsScreenSaverAutoPlay:
+                s = [['kino', 'week'], ['dvd', 'week'], ['filmweb', self.year], ['wannasee', ''], ['city', ''], ['afterpremiere', '']]
+                self.opt['site'] = s[int(self.settingsScreenSaverSection)][0]
+                self.opt['arg'] = s[int(self.settingsScreenSaverSection)][1]
+            else:
+                return
+    
+        debug.debug('opt: ' + str(self.opt))
+        
+        if 'site' not in self.opt.keys():
+            import menu as load
+        elif self.opt['site'] == 'kino':
             import getTrailersKino as load
-        elif self.opt == 'dvd':
+        elif self.opt['site'] == 'dvd':
             import getTrailersDVD as load
-        elif self.opt == 'filmweb':
+        elif self.opt['site'] == 'filmweb':
             import getTrailersFilmweb as load
-        elif self.opt == 'top':
+        elif self.opt['site'] == 'top':
             import getTrailersTop as load
-        elif self.opt == 'wannasee':
+        elif self.opt['site'] == 'wannasee':
             import getTrailersSee as load
-        elif self.opt == 'city':
+        elif self.opt['site'] == 'city':
             import getTrailersCity as load
-        elif self.opt == 'user':
-            import getTrailersUser as load
+        elif self.opt['site'] == 'friends':
+            import getTrailersFriends as load
+        elif self.opt['site'] == 'afterpremiere':
+            import getTrailersAfterPremiere as load
         else:
             import menu as load
         
-        load.main().parse(self)
+        if load.main().parse(self) == False:
+            return False
         self.playList()
     
     # PLAYLIST
