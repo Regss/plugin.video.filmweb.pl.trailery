@@ -117,4 +117,3 @@ class Trailers:
             xbmc.Player().play(playList)
     
 Trailers()
-    

@@ -192,8 +192,10 @@ class Filmweb:
         data = urllib.urlencode(values)
         
         if 'get' in http_method:
+            debug.debug(API_URL + '?' + data)
             req = urllib2.Request(API_URL + '?' + data)
         else:
+            debug.debug(API_URL + str(data))
             req = urllib2.Request(API_URL, data)
         
         for i in range(0, 2):
@@ -206,20 +208,21 @@ class Filmweb:
                 file.close()
         
             req.add_header('cookie', cookie)
-        
+            
             try:
                 response = urllib2.urlopen(req)
-            except Exception as error:
-                debug.debug(str(error))
-                debug.notify('Błąd połaczenia')
-                return False
+                page = response.read()
                 
-            page = response.read()
+            except Exception as error:
+                page = str(error)
+                debug.notify('Błąd połaczenia')
+                
             debug.debug('Odpowiedź z serwera - ' + page)
             
             # if not logged go to login and return to request
             matches = re.search('exc UserNotLoggedInException', page)
-            if matches:
+            matches2 = re.search('HTTP Error 302', page)
+            if matches or matches2:
                 if self.login() == False:
                     return False
             else:
