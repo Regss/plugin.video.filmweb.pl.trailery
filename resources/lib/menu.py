@@ -21,11 +21,13 @@ class main:
         ['Premiery Kino', 'kino', __path_img__ + '//kino.png'],
         ['Premiery DVD', 'dvd', __path_img__ + '//dvd.png'],
         ['Polecane przez Filmweb', 'filmweb', __path_img__ + '//star.png'],
+        ['Popularne filmy', 'popular', __path_img__ + '//star.png'],
         ['Rankingi', 'top', __path_img__ + '//top.png'],
         ['Chcę zobaczyć', 'wannasee', __path_img__ + '//see.png'],
         ['W moim mieście', 'city', __path_img__ + '//city.png'],
         ['Filmy znajomych', 'friends', __path_img__ + '//user.png'],
-        ['Po premierze DVD które chcę zobaczyć', 'afterpremiere', __path_img__ + '//dvd.png']
+        ['Po premierze DVD które chcę zobaczyć', 'afterpremiere', __path_img__ + '//dvd.png'],
+        ['Szukaj', 'search', __path_img__ + '//see.png']
         ]
 
         for key in menu:

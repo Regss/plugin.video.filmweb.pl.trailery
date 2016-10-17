@@ -41,6 +41,16 @@ class Filmweb:
             return False
         matches = re.findall(',\[([0-9]+),', string)
         return matches
+    
+    def getPopularFilms(self):
+        # pobranie id filmów
+        to_see_array = {}
+        api_method = 'getPopularFilms [null, null]\n'.encode('string_escape')
+        string = self.sendRequest(api_method, 'get')
+        if string == False:
+            return False
+        matches = re.findall(',([0-9]+)\],', string)
+        return matches
         
     def getUserFriends(self):
         tableNames = ['login', '', '', 'name', 'id', '', '', '']
@@ -215,7 +225,8 @@ class Filmweb:
                 
             except Exception as error:
                 page = str(error)
-                debug.notify('Błąd połaczenia')
+                if i > 0:
+                    debug.notify('Błąd połaczenia')
                 
             debug.debug('Odpowiedź z serwera - ' + page)
             
