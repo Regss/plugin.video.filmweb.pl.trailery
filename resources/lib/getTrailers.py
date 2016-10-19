@@ -62,6 +62,12 @@ class main:
                     listitem.setInfo(type='Video', infoLabels={ 'Votes': data['votes']})
                     listitem.setInfo(type='Video', infoLabels={ 'Plot': desc})
                     listitem.setInfo(type='Video', infoLabels={ 'Genre': data['genre']})
+                    
+                    context = []
+                    context.append(('Filmweb - Chcę zobaczyć', 'RunScript(plugin.video.filmweb.pl.trailery, 1, ?action=wantwatch&id=' + id + ')'))
+                    context.append(('Filmweb - Nie chcę zobaczyć', 'RunScript(plugin.video.filmweb.pl.trailery, 1, ?action=dontwantwatch&id=' + id + ')'))
+                    listitem.addContextMenuItems(context)
+
                     xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]), url=trailer, listitem=listitem, isFolder=False)
                     self.MOVIES.append({'url': trailer, 'title': data['title'], 'item': listitem, 'poster': data['poster']})
                 

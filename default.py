@@ -20,6 +20,7 @@ __path_img__            = os.path.join(__addonpath__, 'resources', 'media' )
 sys.path.append (__path__)
 sys.path.append (__path_img__)
 
+import actions
 import debug
 
 class Trailers:
@@ -49,6 +50,10 @@ class Trailers:
         
     def start(self):
         debug.debug('opt: ' + str(self.opt))
+        
+        if 'action' in self.opt.keys():
+            actions.main().start(self.opt)
+            return
         
         # check new DVD premiere to wanna see and notify
         if 'true' in self.settingsCheckNew:
@@ -84,6 +89,8 @@ class Trailers:
             import getTrailersDVD as load
         elif self.opt['site'] == 'filmweb':
             import getTrailersFilmweb as load
+        elif self.opt['site'] == 'popular':
+            import getTrailersPopular as load
         elif self.opt['site'] == 'top':
             import getTrailersTop as load
         elif self.opt['site'] == 'wannasee':

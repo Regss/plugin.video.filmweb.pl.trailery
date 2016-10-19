@@ -142,25 +142,49 @@ class Filmweb:
         return {}
         
     def getFilmDatePremiereDVD(self, filmwebID):
-            req = urllib2.Request('http://www.filmweb.pl/Film?id=' + filmwebID)
+        req = urllib2.Request('http://www.filmweb.pl/Film?id=' + filmwebID)
+        response = urllib2.urlopen(req)
+        page = response.read()
+        match = re.findall('filmTitle[^<]+<[^<]+href="([^"]+)"', page)
+        if len(match) > 0:
+            req = urllib2.Request('http://www.filmweb.pl' + match[0] + '/editions')
             response = urllib2.urlopen(req)
             page = response.read()
-            match = re.findall('filmTitle[^<]+<[^<]+href="([^"]+)"', page)
+            match = re.findall('data premiery do sprzedaży: ([0-9]+)-([0-9]+)-([0-9]+)', page)
             if len(match) > 0:
-                req = urllib2.Request('http://www.filmweb.pl' + match[0] + '/editions')
-                response = urllib2.urlopen(req)
-                page = response.read()
-                match = re.findall('data premiery do sprzedaży: ([0-9]+)-([0-9]+)-([0-9]+)', page)
-                if len(match) > 0:
-                    date_temp = []
-                    for m in match:
-                        date_temp.append(int(m[2] + m[1] + m[0]))
-                    return min(date_temp)
-                else:
-                    return 99999999
+                date_temp = []
+                for m in match:
+                    date_temp.append(int(m[2] + m[1] + m[0]))
+                return min(date_temp)
             else:
                 return 99999999
+        else:
+            return 99999999
                 
+    def addUserFilmWantToSee(self, filmwebID):
+        api_method = 'addUserFilmWantToSee [' + str(filmwebID) + ',3]\n'.encode('string_escape')
+        string = self.sendRequest(api_method, 'post')
+        if string == False:
+            return False
+        string = unicode(string, 'utf-8', errors='ignore')
+        matches = re.search('exc', string.encode('utf-8'))
+        if matches == None:
+            return True
+        else:
+            return False
+        
+    def removeUserFilmWantToSee(self, filmwebID):
+        api_method = 'removeUserFilmWantToSee [' + str(filmwebID) + ',3]\n'.encode('string_escape')
+        string = self.sendRequest(api_method, 'post')
+        if string == False:
+            return False
+        string = unicode(string, 'utf-8', errors='ignore')
+        matches = re.search('exc', string.encode('utf-8'))
+        if matches == None:
+            return True
+        else:
+            return False
+    
     def login(self):
 
         api_method = 'login [' + LOGIN + ',' + PASS + ',1]\n'.encode('string_escape')
