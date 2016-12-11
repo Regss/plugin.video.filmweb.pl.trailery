@@ -101,6 +101,8 @@ class Trailers:
             import getTrailersFriends as load
         elif self.opt['site'] == 'afterpremiere':
             import getTrailersAfterPremiere as load
+        elif self.opt['site'] == 'search':
+            import search as load
         else:
             import menu as load
         
